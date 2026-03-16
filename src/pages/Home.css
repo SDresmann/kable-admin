@@ -1,0 +1,176 @@
+/* Home page – no navbar */
+.home-page {
+  min-height: 100vh;
+  background: #ffffff;
+  text-align: left;
+}
+
+.home-page .page-header {
+  padding: 1.25rem 2rem;
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-links {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.header-link {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #172649;
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+}
+
+.header-link:hover {
+  text-decoration: underline;
+}
+
+/* Kable Academy logo – blue text, stylized K with blue circle */
+.home-page .kable-logo {
+  display: inline-flex;
+  align-items: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #172649;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+}
+
+.home-page .logo-k-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.home-page .logo-k-circle {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #6ecf81;
+  left: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.home-page .logo-k-letter {
+  position: relative;
+  z-index: 1;
+  color: #172649;
+}
+
+.home-page .logo-rest {
+  margin-left: 2px;
+  color: #172649;
+}
+
+/* Main content */
+.home-main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.home-heading {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #374151;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin: 0 0 0.5rem 0;
+}
+
+.home-subheading {
+  font-size: 1rem;
+  color: #4b5563;
+  margin: 0 0 2rem 0;
+  line-height: 1.5;
+}
+
+/* 2x2 grid of tiles */
+.home-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+}
+
+.home-tile {
+  aspect-ratio: 4 / 3;
+  min-height: 200px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-size: cover;
+  background-position: center;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden;
+}
+
+/* Kable brand tile colors – applied in CSS so they always show */
+.home-tile.tile-navy {
+  background-color: #172649;
+}
+
+.home-tile.tile-green {
+  background-color: #6ecf81;
+}
+
+.home-tile.tile-green:hover {
+  background-color: #5bb86d;
+}
+
+.home-tile.tile-navy:hover {
+  background-color: #0f1a33;
+}
+
+/* Desaturated look for image tiles */
+.home-tile.tile-with-image {
+  filter: saturate(0.85);
+}
+
+.home-tile.tile-with-image:hover {
+  filter: saturate(1);
+}
+
+.home-tile:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+a.home-tile {
+  text-decoration: none;
+}
+
+.tile-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+  text-align: center;
+  padding: 1rem;
+  line-height: 1.25;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+@media (max-width: 768px) {
+  .home-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .home-heading {
+    font-size: 1.5rem;
+  }
+}

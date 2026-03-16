@@ -1,0 +1,423 @@
+/* Cohorts page */
+.cohorts-page {
+  min-height: 100vh;
+  background: #ffffff;
+  text-align: left;
+}
+
+.cohorts-page .page-header {
+  padding: 1.25rem 2rem;
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cohorts-page .kable-logo {
+  display: inline-flex;
+  align-items: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #172649;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+}
+
+.cohorts-page .logo-k-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cohorts-page .logo-k-letter {
+  position: relative;
+  z-index: 1;
+  color: #172649;
+}
+
+.cohorts-page .logo-rest {
+  margin-left: 2px;
+  color: #172649;
+}
+
+.cohorts-main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.cohorts-heading {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #374151;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin: 0 0 0.5rem 0;
+}
+
+.cohorts-subheading {
+  font-size: 1rem;
+  color: #4b5563;
+  margin: 0 0 2rem 0;
+  line-height: 1.5;
+}
+
+.cohorts-content {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-top: 4px solid #172649;
+}
+
+.cohorts-loading,
+.cohorts-empty {
+  text-align: center;
+  padding: 2rem;
+  color: #6b7280;
+  font-size: 1rem;
+}
+
+.cohorts-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem;
+  color: #dc2626;
+  text-align: center;
+}
+
+.cohorts-retry {
+  padding: 0.5rem 1rem;
+  background: #6ecf81;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.cohorts-retry:hover {
+  background: #5bb86d;
+}
+
+.cohorts-create-form {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-end;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.cohorts-create-form .cohorts-input-date {
+  width: 140px;
+}
+
+.cohorts-input {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 1rem;
+  min-width: 200px;
+  flex: 1;
+  max-width: 320px;
+}
+
+.cohorts-input:focus {
+  outline: none;
+  border-color: #172649;
+  box-shadow: 0 0 0 2px rgba(23, 38, 73, 0.2);
+}
+
+.cohorts-input-inline {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.cohorts-input-date {
+  min-width: 0;
+  width: 100%;
+}
+
+.cohorts-date-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.cohorts-date-label-text {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.cohorts-date-cell {
+  color: #6b7280;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.cohorts-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.cohorts-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.cohorts-btn-primary {
+  background: #6ecf81;
+  color: #ffffff;
+  border-color: #6ecf81;
+}
+
+.cohorts-btn-primary:hover:not(:disabled) {
+  background: #5bb86d;
+}
+
+.cohorts-btn-small {
+  padding: 0.35rem 0.65rem;
+  font-size: 0.85rem;
+}
+
+.cohorts-btn-ghost {
+  background: transparent;
+  color: #4b5563;
+  border-color: #d1d5db;
+}
+
+.cohorts-btn-ghost:hover:not(:disabled) {
+  background: #e8ebf2;
+}
+
+.cohorts-btn-danger {
+  color: #dc2626;
+  border-color: #fca5a5;
+}
+
+.cohorts-btn-danger:hover:not(:disabled) {
+  background: #fef2f2;
+}
+
+.cohorts-create-error {
+  color: #dc2626;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.cohorts-table-wrap {
+  overflow-x: auto;
+}
+
+.cohorts-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.cohorts-table thead {
+  background: #e8ebf2;
+  border-bottom: 2px solid #172649;
+}
+
+.cohorts-table th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.cohorts-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  vertical-align: middle;
+}
+
+.cohorts-table tbody tr:hover {
+  background: #e8f5e9;
+}
+
+.cohorts-name {
+  font-weight: 500;
+  color: #111827;
+}
+
+.cohorts-date {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.cohorts-th-actions {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.cohorts-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.cohorts-delete-confirm {
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .cohorts-create-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .cohorts-input {
+    max-width: none;
+  }
+
+  .cohorts-main {
+    padding: 1rem;
+  }
+
+  .cohorts-heading {
+    font-size: 1.5rem;
+  }
+}
+
+/* Releases modal */
+.cohorts-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.cohorts-modal {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  max-width: 720px;
+  width: 100%;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.cohorts-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 2px solid #172649;
+  background: #e8ebf2;
+}
+
+.cohorts-modal-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #172649;
+}
+
+.cohorts-modal-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0.25rem;
+}
+
+.cohorts-modal-close:hover {
+  color: #111827;
+}
+
+.cohorts-modal-subtitle {
+  margin: 0 1.5rem 1rem;
+  font-size: 0.9rem;
+  color: #4b5563;
+  line-height: 1.4;
+}
+
+.cohorts-releases-loading {
+  padding: 2rem 1.5rem;
+  text-align: center;
+  color: #6b7280;
+}
+
+.cohorts-releases-table-wrap {
+  overflow: auto;
+  flex: 1;
+  padding: 0 1.5rem;
+}
+
+.cohorts-releases-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+}
+
+.cohorts-releases-table th {
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: #172649;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid #172649;
+  background: #e8ebf2;
+}
+
+.cohorts-releases-table td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid #e5e7eb;
+  vertical-align: middle;
+}
+
+.cohorts-releases-week {
+  width: 3rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.cohorts-releases-title {
+  font-size: 0.9rem;
+  color: #374151;
+  max-width: 320px;
+}
+
+.cohorts-releases-table .cohorts-input-date {
+  width: 140px;
+}
+
+.cohorts-modal-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}

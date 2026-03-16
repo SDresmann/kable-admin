@@ -1,0 +1,210 @@
+/* Archive page */
+.archive-page {
+  min-height: 100vh;
+  background: #ffffff;
+  text-align: left;
+}
+
+.archive-page .page-header {
+  padding: 1.25rem 2rem;
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.archive-page .kable-logo {
+  display: inline-flex;
+  align-items: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #172649;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+}
+
+.archive-page .logo-k-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.archive-page .logo-k-letter {
+  position: relative;
+  z-index: 1;
+  color: #172649;
+}
+
+.archive-page .logo-rest {
+  margin-left: 2px;
+  color: #172649;
+}
+
+.header-link {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #172649;
+  text-decoration: none;
+}
+
+.header-link:hover {
+  text-decoration: underline;
+}
+
+.archive-main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.archive-heading {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #374151;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin: 0 0 0.5rem 0;
+}
+
+.archive-subheading {
+  font-size: 1rem;
+  color: #4b5563;
+  margin: 0 0 2rem 0;
+  line-height: 1.5;
+}
+
+.archive-link {
+  color: #172649;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.archive-link:hover {
+  text-decoration: underline;
+}
+
+.archive-content {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-top: 4px solid #172649;
+}
+
+.archive-loading,
+.archive-empty {
+  text-align: center;
+  padding: 2rem;
+  color: #6b7280;
+  font-size: 1rem;
+}
+
+.archive-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem;
+  color: #dc2626;
+  text-align: center;
+}
+
+.archive-retry {
+  padding: 0.5rem 1rem;
+  background: #6ecf81;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.archive-retry:hover {
+  background: #5bb86d;
+}
+
+.archive-table-wrap {
+  overflow-x: auto;
+}
+
+.archive-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.archive-table thead {
+  background: #e8ebf2;
+  color: #172649;
+}
+
+.archive-table th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+.archive-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.archive-table tbody tr:hover {
+  background: #e8f5e9;
+}
+
+.archive-name {
+  font-weight: 500;
+  color: #374151;
+}
+
+.archive-date-cell {
+  color: #6b7280;
+}
+
+.archive-th-actions {
+  width: 120px;
+  text-align: right;
+}
+
+.archive-actions-cell {
+  text-align: right;
+}
+
+.archive-btn {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-family: inherit;
+}
+
+.archive-btn-reactivate {
+  background: #6ecf81;
+  color: #ffffff;
+}
+
+.archive-btn-reactivate:hover:not(:disabled) {
+  background: #5bb86d;
+}
+
+.archive-btn-reactivate:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.archive-reactivate-error {
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  background: #fef2f2;
+  color: #dc2626;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
