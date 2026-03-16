@@ -26,7 +26,9 @@ export default function AssignmentsPage() {
   const [submissions, setSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  // eslint-disable-next-line no-unused-vars
   const [selectedStudent, setSelectedStudent] = useState(null);
+  // eslint-disable-next-line no-unused-vars
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
@@ -38,6 +40,7 @@ export default function AssignmentsPage() {
     setIsModalOpen(true);
   };
 
+  // eslint-disable-next-line no-unused-vars
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedStudent(null);

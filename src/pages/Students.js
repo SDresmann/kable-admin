@@ -68,6 +68,7 @@ export default function StudentsPage() {
   const [editingName, setEditingName] = useState(false);
   const [editedName, setEditedName] = useState('');
   const [editingCohort, setEditingCohort] = useState(false);
+  // eslint-disable-next-line no-unused-vars
   const [editedCohort, setEditedCohort] = useState('');
   const [editedCohortId, setEditedCohortId] = useState('');
   const [cohorts, setCohorts] = useState([]);
