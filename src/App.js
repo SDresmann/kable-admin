@@ -8,6 +8,7 @@ import Archive from './pages/Archive';
 import Assignments from './pages/Assignments';
 import Login from './pages/Login';
 import ChangePassword from './pages/ChangePassword';
+import CreateUser from './pages/CreateUser';
 import './App.css';
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
           <Route path="/change-password" element={<ProtectedRoute><ChangePassword /></ProtectedRoute>} />
+          <Route path="/create-user" element={<ProtectedRoute><CreateUser /></ProtectedRoute>} />
           <Route path="/students" element={<ProtectedRoute><Students /></ProtectedRoute>} />
           <Route path="/cohorts" element={<ProtectedRoute><Cohorts /></ProtectedRoute>} />
           <Route path="/archive" element={<ProtectedRoute><Archive /></ProtectedRoute>} />
