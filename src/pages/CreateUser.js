@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { createUser, resetPassword } from '../api';
+import { createUser, resetPassword, API_URL } from '../api';
 import './CreateUser.css';
-
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 
 export default function CreateUser() {
   const [email, setEmail] = useState('');

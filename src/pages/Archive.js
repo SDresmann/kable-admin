@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { getAuthHeaders } from '../api';
+import { getAuthHeaders, API_URL } from '../api';
 import './Archive.css';
-
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 
 function dateToDisplay(d) {
   if (!d) return '—';

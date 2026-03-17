@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { API_URL } from '../api';
 import './Assignments.css';
 
 function KableLogo() {
@@ -12,8 +13,6 @@ function KableLogo() {
     </Link>
   );
 }
-
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 
 // Assignment types we track (from Kable Career)
 const ASSIGNMENT_LABELS = {
@@ -66,7 +65,7 @@ export default function AssignmentsPage() {
     } catch (err) {
       console.error('Error fetching data:', err);
       if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
-        setError(`Cannot connect to backend at ${API_URL}. Make sure the admin backend is running on port 5001 and using the same MongoDB as Kable Career.`);
+        setError(`Cannot connect to backend at ${API_URL}. Make sure the admin backend is running and using the same MongoDB as Kable Career.`);
       } else {
         setError(err.message || 'Failed to load data.');
       }

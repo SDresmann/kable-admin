@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { getAuthHeaders } from '../api';
+import { getAuthHeaders, API_URL } from '../api';
 import './Cohorts.css';
-
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 
 /** Section (week) titles – must match Kable Career sectionData.js */
 const SECTION_TITLES = [

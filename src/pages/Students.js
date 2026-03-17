@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { API_URL } from '../api';
 import './Students.css';
 
 function KableLogo() {
@@ -12,8 +13,6 @@ function KableLogo() {
     </Link>
   );
 }
-
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 
 function escapeHtml(text) {
   if (!text) return '';
@@ -302,7 +301,7 @@ export default function StudentsPage() {
     } catch (err) {
       console.error('Error fetching students:', err);
       if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
-        setError(`Cannot connect to backend server at ${API_URL}. Make sure the backend is running on port 5001.`);
+        setError(`Cannot connect to backend server at ${API_URL}. Make sure the admin backend is running.`);
       } else {
         setError(err.message || 'Failed to connect to server. Make sure the backend is running.');
       }
