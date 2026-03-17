@@ -62,7 +62,7 @@ export async function createUser(email, password, role = 'admin', cohortId = nul
   if (role === 'student' && cohortId) body.cohortId = cohortId;
   const res = await fetch(`${API_URL}/api/auth/create-user`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify(body),
   });
   const data = await res.json().catch(() => ({}));
@@ -73,7 +73,7 @@ export async function createUser(email, password, role = 'admin', cohortId = nul
 export async function resetPassword(email, newPassword) {
   const res = await fetch(`${API_URL}/api/auth/reset-password`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify({ email, newPassword }),
   });
   const data = await res.json().catch(() => ({}));

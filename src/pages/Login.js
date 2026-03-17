@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { login as apiLogin } from '../api';
 import './Login.css';
@@ -9,8 +9,14 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { user, login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || '/';
+
+  if (user) {
+    return <Navigate to={from} replace />;
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -19,7 +25,7 @@ export default function Login() {
     try {
       const data = await apiLogin(email.trim().toLowerCase(), password);
       login({ userId: data.userId, token: data.token, email: data.email || email });
-      navigate('/', { replace: true });
+      navigate(from, { replace: true });
     } catch (err) {
       setError(err.message || 'Login failed');
     } finally {
@@ -59,7 +65,7 @@ export default function Login() {
           </button>
         </form>
         <p className="login-footer">
-          <Link to="/">Back to dashboard</Link>
+          You need admin credentials to access the dashboard.
         </p>
       </div>
     </div>

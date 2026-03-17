@@ -1,5 +1,6 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
 import Students from './pages/Students';
 import Cohorts from './pages/Cohorts';
@@ -15,14 +16,15 @@ function App() {
     <AuthProvider>
       <Router>
         <Routes>
-          <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/change-password" element={<ChangePassword />} />
-          <Route path="/create-user" element={<CreateUser />} />
-          <Route path="/students" element={<Students />} />
-          <Route path="/cohorts" element={<Cohorts />} />
-          <Route path="/archive" element={<Archive />} />
-          <Route path="/assignments" element={<Assignments />} />
+          <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+          <Route path="/change-password" element={<ProtectedRoute><ChangePassword /></ProtectedRoute>} />
+          <Route path="/create-user" element={<ProtectedRoute><CreateUser /></ProtectedRoute>} />
+          <Route path="/students" element={<ProtectedRoute><Students /></ProtectedRoute>} />
+          <Route path="/cohorts" element={<ProtectedRoute><Cohorts /></ProtectedRoute>} />
+          <Route path="/archive" element={<ProtectedRoute><Archive /></ProtectedRoute>} />
+          <Route path="/assignments" element={<ProtectedRoute><Assignments /></ProtectedRoute>} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
     </AuthProvider>
