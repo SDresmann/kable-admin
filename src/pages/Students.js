@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { API_URL } from '../api';
+import { API_URL, getAuthHeaders } from '../api';
 import './Students.css';
 
 function KableLogo() {
@@ -87,7 +87,7 @@ export default function StudentsPage() {
   }, []);
 
   useEffect(() => {
-    fetch(`${API_URL}/api/cohorts`)
+    fetch(`${API_URL}/api/cohorts`, { headers: getAuthHeaders() })
       .then((res) => res.json())
       .then((result) => {
         if (result.success && Array.isArray(result.data)) setCohorts(result.data);
@@ -129,7 +129,7 @@ export default function StudentsPage() {
     setSubmissionsError(null);
     try {
       setSubmissionsLoading(true);
-      const response = await fetch(`${API_URL}/api/submissions?userEmail=${encodeURIComponent(email)}`);
+      const response = await fetch(`${API_URL}/api/submissions?userEmail=${encodeURIComponent(email)}`, { headers: getAuthHeaders() });
       const result = await response.json().catch(() => ({}));
       if (!response.ok) {
         throw new Error(result.message || 'Failed to fetch submissions');
@@ -150,7 +150,7 @@ export default function StudentsPage() {
     setQuizResultsError(null);
     try {
       setQuizResultsLoading(true);
-      const response = await fetch(`${API_URL}/api/quiz-results?userEmail=${encodeURIComponent(email)}`);
+      const response = await fetch(`${API_URL}/api/quiz-results?userEmail=${encodeURIComponent(email)}`, { headers: getAuthHeaders() });
       const result = await response.json().catch(() => ({}));
       if (!response.ok) {
         throw new Error(result.message || 'Failed to fetch quiz results');
@@ -171,7 +171,7 @@ export default function StudentsPage() {
     setAssignmentCommentsError(null);
     try {
       setAssignmentCommentsLoading(true);
-      const response = await fetch(`${API_URL}/api/assignment-comments?userEmail=${encodeURIComponent(email)}`);
+      const response = await fetch(`${API_URL}/api/assignment-comments?userEmail=${encodeURIComponent(email)}`, { headers: getAuthHeaders() });
       const result = await response.json().catch(() => ({}));
       if (!response.ok) {
         throw new Error(result.message || 'Failed to fetch assignment comments');
@@ -256,7 +256,7 @@ export default function StudentsPage() {
       setCohortSaving(true);
       const res = await fetch(`${API_URL}/api/students/${studentId}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ cohortId: newCohortId }),
       });
       const result = await res.json();
@@ -671,14 +671,28 @@ export default function StudentsPage() {
                             </td>
                             <td>{sub.originalFilename || '—'}</td>
                             <td>
-                              <a
-                                href={`${API_URL}/api/submissions/${sub._id}/file`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="resume-link"
+                              <button
+                                type="button"
+                                className="resume-link button-as-link"
+                                onClick={async () => {
+                                  try {
+                                    const res = await fetch(`${API_URL}/api/submissions/${sub._id}/file`, { headers: getAuthHeaders() });
+                                    if (!res.ok) throw new Error('Download failed');
+                                    const blob = await res.blob();
+                                    const url = URL.createObjectURL(blob);
+                                    const a = document.createElement('a');
+                                    a.href = url;
+                                    a.download = sub.originalFilename || 'download';
+                                    a.click();
+                                    URL.revokeObjectURL(url);
+                                  } catch (e) {
+                                    console.error(e);
+                                    window.alert('Download failed. Make sure you are logged in.');
+                                  }
+                                }}
                               >
                                 Download file
-                              </a>
+                              </button>
                             </td>
                           </tr>
                         ))}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { createUser, resetPassword, API_URL } from '../api';
+import { createUser, resetPassword, API_URL, getAuthHeaders } from '../api';
 import './CreateUser.css';
 
 export default function CreateUser() {
@@ -15,7 +15,7 @@ export default function CreateUser() {
   const [showReset, setShowReset] = useState(false);
 
   useEffect(() => {
-    fetch(`${API_URL}/api/cohorts`)
+    fetch(`${API_URL}/api/cohorts`, { headers: getAuthHeaders() })
       .then((res) => res.json())
       .then((result) => {
         if (result.success && Array.isArray(result.data)) setCohorts(result.data);

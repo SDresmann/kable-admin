@@ -424,6 +424,14 @@
   text-decoration: underline;
 }
 
+.button-as-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
 .submissions-loading,
 .no-submissions {
   margin: 0;

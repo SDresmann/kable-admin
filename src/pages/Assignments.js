@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { API_URL } from '../api';
+import { API_URL, getAuthHeaders } from '../api';
 import './Assignments.css';
 
 function KableLogo() {
@@ -50,8 +50,8 @@ export default function AssignmentsPage() {
       setLoading(true);
       setError(null);
       const [studentsRes, submissionsRes] = await Promise.all([
-        fetch(`${API_URL}/api/students`),
-        fetch(`${API_URL}/api/submissions`),
+        fetch(`${API_URL}/api/students`, { headers: getAuthHeaders() }),
+        fetch(`${API_URL}/api/submissions`, { headers: getAuthHeaders() }),
       ]);
 
       if (!studentsRes.ok) throw new Error('Failed to fetch students');
@@ -83,7 +83,22 @@ export default function AssignmentsPage() {
     return acc;
   }, {});
 
-  const downloadUrl = (id) => `${API_URL}/api/submissions/${id}/file`;
+  const downloadSubmissionFile = async (id, filename) => {
+    try {
+      const res = await fetch(`${API_URL}/api/submissions/${id}/file`, { headers: getAuthHeaders() });
+      if (!res.ok) throw new Error('Download failed');
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename || 'download';
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error(e);
+      window.alert('Download failed. Make sure you are logged in.');
+    }
+  };
 
   // Get the latest submission for an assignment name for a student
   const getSubmission = (email, assignmentName) => {
@@ -163,14 +178,13 @@ export default function AssignmentsPage() {
                                           })
                                         : ''}
                                     </span>
-                                    <a
-                                      href={downloadUrl(sub._id)}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="download-link"
+                                    <button
+                                      type="button"
+                                      className="download-link button-as-link"
+                                      onClick={() => downloadSubmissionFile(sub._id, sub.originalFilename)}
                                     >
                                       Download
-                                    </a>
+                                    </button>
                                   </span>
                                 ) : (
                                   <span className="assignment-not-done">Not submitted</span>
