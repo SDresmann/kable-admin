@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { API_URL, getAuthHeaders } from '../api';
 import './Students.css';
 
@@ -81,6 +82,8 @@ export default function StudentsPage() {
   const [quizResultsError, setQuizResultsError] = useState(null);
   const [assignmentCommentsError, setAssignmentCommentsError] = useState(null);
   const [cohortSaving, setCohortSaving] = useState(false);
+  const { logout } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchStudents();
@@ -285,8 +288,13 @@ export default function StudentsPage() {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch(`${API_URL}/api/students`);
-      
+      const response = await fetch(`${API_URL}/api/students`, { headers: getAuthHeaders() });
+
+      if (response.status === 401) {
+        logout();
+        navigate('/login', { replace: true });
+        return;
+      }
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
