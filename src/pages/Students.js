@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { API_URL, getAuthHeaders } from '../api';
@@ -82,8 +82,50 @@ export default function StudentsPage() {
   const [quizResultsError, setQuizResultsError] = useState(null);
   const [assignmentCommentsError, setAssignmentCommentsError] = useState(null);
   const [cohortSaving, setCohortSaving] = useState(false);
+  const [studentSearch, setStudentSearch] = useState('');
+  const [studentSort, setStudentSort] = useState('default');
   const { logout } = useAuth();
   const navigate = useNavigate();
+
+  const filteredSortedStudents = useMemo(() => {
+    const cohortLabel = (cohortId) => {
+      if (!cohortId) return '—';
+      const c = cohorts.find((x) => String(x._id) === String(cohortId));
+      return c ? c.name : '—';
+    };
+    const q = studentSearch.trim().toLowerCase();
+    let list = [...students];
+    if (q) {
+      list = list.filter((s) => {
+        const email = (s.email || '').toLowerCase();
+        const name = (s.name || s.email?.split('@')[0] || '').toLowerCase();
+        const cohort = cohortLabel(s.cohortId).toLowerCase();
+        const id = String(s._id || s.id || '').toLowerCase();
+        return email.includes(q) || name.includes(q) || cohort.includes(q) || id.includes(q);
+      });
+    }
+    if (studentSort === 'email-asc') {
+      list.sort((a, b) =>
+        (a.email || '').localeCompare(b.email || '', undefined, { sensitivity: 'base' })
+      );
+    } else if (studentSort === 'name-asc') {
+      const displayName = (s) => (s.name || s.email?.split('@')[0] || '').trim();
+      list.sort((a, b) =>
+        displayName(a).localeCompare(displayName(b), undefined, { sensitivity: 'base' })
+      );
+    } else if (studentSort === 'cohort-asc') {
+      const sortKey = (s) => {
+        const n = cohortLabel(s.cohortId);
+        return n === '—' ? '\uFFFF' : n;
+      };
+      list.sort((a, b) => {
+        const byCohort = sortKey(a).localeCompare(sortKey(b), undefined, { sensitivity: 'base' });
+        if (byCohort !== 0) return byCohort;
+        return (a.email || '').localeCompare(b.email || '', undefined, { sensitivity: 'base' });
+      });
+    }
+    return list;
+  }, [students, cohorts, studentSearch, studentSort]);
 
   useEffect(() => {
     fetchStudents();
@@ -346,6 +388,34 @@ export default function StudentsPage() {
                 <div className="no-students">No students found in the database.</div>
               ) : (
                 <div className="students-table-container">
+                  <div className="students-toolbar" role="search">
+                    <label className="students-toolbar-label" htmlFor="student-search">
+                      Search
+                    </label>
+                    <input
+                      id="student-search"
+                      type="search"
+                      className="students-search-input"
+                      placeholder="Name, email, cohort, or user ID…"
+                      value={studentSearch}
+                      onChange={(e) => setStudentSearch(e.target.value)}
+                      autoComplete="off"
+                    />
+                    <label className="students-toolbar-label" htmlFor="student-sort">
+                      Sort
+                    </label>
+                    <select
+                      id="student-sort"
+                      className="students-sort-select"
+                      value={studentSort}
+                      onChange={(e) => setStudentSort(e.target.value)}
+                    >
+                      <option value="default">Default (API order)</option>
+                      <option value="email-asc">Email (A–Z)</option>
+                      <option value="name-asc">Name (A–Z)</option>
+                      <option value="cohort-asc">Cohort (A–Z)</option>
+                    </select>
+                  </div>
                   <table className="students-table">
                     <thead>
                       <tr>
@@ -356,37 +426,53 @@ export default function StudentsPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {students.map((student, index) => (
-                        <tr key={student._id || student.id || index}>
-                          <td>
-                            <button 
-                              className="student-email-link"
-                              onClick={() => openModal(student)}
-                            >
-                              {student.email || 'N/A'}
-                            </button>
+                      {filteredSortedStudents.length === 0 ? (
+                        <tr>
+                          <td colSpan={4} className="students-no-matches">
+                            No students match your search. Try different keywords.
                           </td>
-                          <td>
-                            {getCohortName(student.cohortId)}
-                          </td>
-                          <td>
-                            {student.createdAt
-                              ? new Date(student.createdAt).toLocaleDateString('en-US', {
-                                  year: 'numeric',
-                                  month: 'short',
-                                  day: 'numeric',
-                                  hour: '2-digit',
-                                  minute: '2-digit',
-                                })
-                              : 'N/A'}
-                          </td>
-                          <td className="user-id-cell">{student._id || student.id || 'N/A'}</td>
                         </tr>
-                      ))}
+                      ) : (
+                        filteredSortedStudents.map((student, index) => (
+                          <tr key={student._id || student.id || index}>
+                            <td>
+                              <button
+                                className="student-email-link"
+                                onClick={() => openModal(student)}
+                              >
+                                {student.email || 'N/A'}
+                              </button>
+                            </td>
+                            <td>{getCohortName(student.cohortId)}</td>
+                            <td>
+                              {student.createdAt
+                                ? new Date(student.createdAt).toLocaleDateString('en-US', {
+                                    year: 'numeric',
+                                    month: 'short',
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                  })
+                                : 'N/A'}
+                            </td>
+                            <td className="user-id-cell">{student._id || student.id || 'N/A'}</td>
+                          </tr>
+                        ))
+                      )}
                     </tbody>
                   </table>
                   <div className="students-count">
-                    Total: {students.length} student{students.length !== 1 ? 's' : ''}
+                    {studentSearch.trim() ? (
+                      <>
+                        Showing {filteredSortedStudents.length} match
+                        {filteredSortedStudents.length !== 1 ? 'es' : ''} of {students.length} student
+                        {students.length !== 1 ? 's' : ''}
+                      </>
+                    ) : (
+                      <>
+                        Total: {students.length} student{students.length !== 1 ? 's' : ''}
+                      </>
+                    )}
                   </div>
                 </div>
               )}
