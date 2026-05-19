@@ -22,7 +22,7 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
-function buildCommentPreviewHtml(comment, assignmentName, submittedAt, checklistChecked) {
+function openCommentInNewTab(comment, assignmentName, submittedAt, checklistChecked) {
   const title = [assignmentName, submittedAt ? new Date(submittedAt).toLocaleDateString() : ''].filter(Boolean).join(' – ');
   const body = escapeHtml(comment || '').replace(/\n/g, '<br>');
   let checklistSection = '';
@@ -32,19 +32,8 @@ function buildCommentPreviewHtml(comment, assignmentName, submittedAt, checklist
     checklistSection = `<h3>Checklist</h3><p><strong>${checked} of ${checklistChecked.length} completed</strong></p><p>${list}</p>`;
   }
   const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${escapeHtml(title) || 'Comment'}</title><style>body{font-family:system-ui,sans-serif;max-width:720px;margin:2rem auto;padding:0 1rem;line-height:1.5;white-space:pre-wrap;word-wrap:break-word;} h3{font-size:1rem;margin-top:1.5rem;}</style></head><body><h2>${escapeHtml(assignmentName || 'Comment')}</h2>${submittedAt ? `<p><small>${escapeHtml(new Date(submittedAt).toLocaleString())}</small></p>` : ''}${checklistSection}<h3>Comment / Reflection</h3><div>${body || '—'}</div></body></html>`;
-  return html;
-}
-
-function openCommentInNewTab(comment, assignmentName, submittedAt, checklistChecked) {
-  const html = buildCommentPreviewHtml(comment, assignmentName, submittedAt, checklistChecked);
-  const url = URL.createObjectURL(new Blob([html], { type: 'text/html;charset=utf-8' }));
-  const tab = window.open(url, '_blank', 'noopener,noreferrer');
-  if (!tab) {
-    URL.revokeObjectURL(url);
-    window.alert('Pop-up blocked. Allow pop-ups to open the comment in a new tab.');
-    return;
-  }
-  setTimeout(() => URL.revokeObjectURL(url), 60000);
+  const url = 'data:text/html;charset=utf-8,' + encodeURIComponent(html);
+  window.open(url, '_blank', 'noopener,noreferrer');
 }
 
 function percentToLetterGrade(percent) {
@@ -448,7 +437,6 @@ export default function StudentsPage() {
                           <tr key={student._id || student.id || index}>
                             <td>
                               <button
-                                type="button"
                                 className="student-email-link"
                                 onClick={() => openModal(student)}
                               >
@@ -727,14 +715,7 @@ export default function StudentsPage() {
                               <button
                                 type="button"
                                 className="comment-open-link"
-                                onClick={() =>
-                                  openCommentInNewTab(
-                                    c.comment,
-                                    c.assignmentName,
-                                    c.submittedAt,
-                                    c.checklistChecked
-                                  )
-                                }
+                                onClick={() => openCommentInNewTab(c.comment, c.assignmentName, c.submittedAt, c.checklistChecked)}
                               >
                                 Open in new tab
                               </button>
