@@ -4,12 +4,6 @@ import { useAuth } from '../context/AuthContext';
 import { login as apiLogin } from '../api';
 import './Login.css';
 
-function redirectPath(fromLocation) {
-  if (!fromLocation?.pathname) return '/';
-  const { pathname, search = '', hash = '' } = fromLocation;
-  return `${pathname}${search}${hash}`;
-}
-
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -18,7 +12,7 @@ export default function Login() {
   const { user, login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const from = redirectPath(location.state?.from);
+  const from = location.state?.from?.pathname || '/';
 
   if (user) {
     return <Navigate to={from} replace />;
@@ -31,7 +25,7 @@ export default function Login() {
     try {
       const data = await apiLogin(email.trim().toLowerCase(), password);
       login({ userId: data.userId, token: data.token, email: data.email || email });
-      navigate(redirectPath(location.state?.from), { replace: true });
+      navigate(from, { replace: true });
     } catch (err) {
       setError(err.message || 'Login failed');
     } finally {

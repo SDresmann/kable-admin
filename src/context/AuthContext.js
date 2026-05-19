@@ -3,20 +3,14 @@ import { getStoredAuth, setStoredAuth, clearStoredAuth } from '../api';
 
 const AuthContext = createContext(null);
 
-function loadUserFromStorage() {
-  const auth = getStoredAuth();
-  if (auth?.userId && auth?.token && auth?.email) {
-    return { userId: auth.userId, token: auth.token, email: auth.email };
-  }
-  return null;
-}
-
 export function AuthProvider({ children }) {
-  // Read localStorage on first render so new tabs don't flash-redirect before session restores.
-  const [user, setUser] = useState(loadUserFromStorage);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    setUser(loadUserFromStorage());
+    const auth = getStoredAuth();
+    if (auth?.userId && auth?.token && auth?.email) {
+      setUser({ userId: auth.userId, token: auth.token, email: auth.email });
+    }
   }, []);
 
   useEffect(() => {

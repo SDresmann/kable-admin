@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { API_URL, getAuthHeaders } from '../api';
 import './Students.css';
@@ -35,13 +35,16 @@ function buildCommentPreviewHtml(comment, assignmentName, submittedAt, checklist
   return html;
 }
 
-function getCommentPreviewBlobUrl(comment, assignmentName, submittedAt, checklistChecked) {
+function openCommentInNewTab(comment, assignmentName, submittedAt, checklistChecked) {
   const html = buildCommentPreviewHtml(comment, assignmentName, submittedAt, checklistChecked);
-  return URL.createObjectURL(new Blob([html], { type: 'text/html;charset=utf-8' }));
-}
-
-function commentPreviewKey(comment) {
-  return comment._id || `${comment.assignmentName}-${comment.submittedAt}-${comment.sectionId}`;
+  const url = URL.createObjectURL(new Blob([html], { type: 'text/html;charset=utf-8' }));
+  const tab = window.open(url, '_blank', 'noopener,noreferrer');
+  if (!tab) {
+    URL.revokeObjectURL(url);
+    window.alert('Pop-up blocked. Allow pop-ups to open the comment in a new tab.');
+    return;
+  }
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
 }
 
 function percentToLetterGrade(percent) {
@@ -94,7 +97,6 @@ export default function StudentsPage() {
   const [studentSort, setStudentSort] = useState('default');
   const { logout } = useAuth();
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
 
   const filteredSortedStudents = useMemo(() => {
     const cohortLabel = (cohortId) => {
@@ -136,44 +138,9 @@ export default function StudentsPage() {
     return list;
   }, [students, cohorts, studentSearch, studentSort]);
 
-  const commentPreviewUrls = useMemo(() => {
-    const urls = new Map();
-    for (const comment of studentAssignmentComments) {
-      urls.set(
-        commentPreviewKey(comment),
-        getCommentPreviewBlobUrl(
-          comment.comment,
-          comment.assignmentName,
-          comment.submittedAt,
-          comment.checklistChecked
-        )
-      );
-    }
-    return urls;
-  }, [studentAssignmentComments]);
-
-  useEffect(() => {
-    return () => {
-      commentPreviewUrls.forEach((url) => URL.revokeObjectURL(url));
-    };
-  }, [commentPreviewUrls]);
-
   useEffect(() => {
     fetchStudents();
   }, []);
-
-  useEffect(() => {
-    const studentId = searchParams.get('student');
-    if (!studentId || loading || students.length === 0) return;
-    const student = students.find(
-      (s) => String(s._id || s.id) === String(studentId)
-    );
-    if (!student) return;
-    const openId = selectedStudent?._id || selectedStudent?.id;
-    if (isModalOpen && openId && String(openId) === String(studentId)) return;
-    openModal(student);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [students, loading, searchParams]);
 
   useEffect(() => {
     fetch(`${API_URL}/api/cohorts`, { headers: getAuthHeaders() })
@@ -206,10 +173,6 @@ export default function StudentsPage() {
     setQuizResultsError(null);
     setAssignmentCommentsError(null);
     setIsModalOpen(true);
-    const id = studentCopy._id || studentCopy.id;
-    if (id) {
-      setSearchParams({ student: String(id) }, { replace: true });
-    }
     if (studentCopy.email) {
       fetchSubmissionsForStudent(studentCopy.email);
       fetchQuizResultsForStudent(studentCopy.email);
@@ -283,11 +246,6 @@ export default function StudentsPage() {
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedStudent(null);
-    if (searchParams.has('student')) {
-      const next = new URLSearchParams(searchParams);
-      next.delete('student');
-      setSearchParams(next, { replace: true });
-    }
     setEditingName(false);
     setEditingCohort(false);
     setEditedName('');
@@ -489,17 +447,13 @@ export default function StudentsPage() {
                         filteredSortedStudents.map((student, index) => (
                           <tr key={student._id || student.id || index}>
                             <td>
-                              <Link
-                                to={`/students?student=${encodeURIComponent(student._id || student.id)}`}
+                              <button
+                                type="button"
                                 className="student-email-link"
-                                onClick={(e) => {
-                                  if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return;
-                                  e.preventDefault();
-                                  openModal(student);
-                                }}
+                                onClick={() => openModal(student)}
                               >
                                 {student.email || 'N/A'}
-                              </Link>
+                              </button>
                             </td>
                             <td>{getCohortName(student.cohortId)}</td>
                             <td>
@@ -748,9 +702,7 @@ export default function StudentsPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {studentAssignmentComments.map((c) => {
-                          const previewUrl = commentPreviewUrls.get(commentPreviewKey(c));
-                          return (
+                        {studentAssignmentComments.map((c) => (
                           <tr key={c._id}>
                             <td>{c.assignmentName || '—'}</td>
                             <td>Section {c.sectionId}</td>
@@ -772,20 +724,23 @@ export default function StudentsPage() {
                             </td>
                             <td className="comment-cell">{c.comment ? (c.comment.length > 80 ? c.comment.slice(0, 80) + '…' : c.comment) : '—'}</td>
                             <td>
-                              {previewUrl ? (
-                                <a
-                                  href={previewUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="comment-open-link"
-                                >
-                                  Open in new tab
-                                </a>
-                              ) : null}
+                              <button
+                                type="button"
+                                className="comment-open-link"
+                                onClick={() =>
+                                  openCommentInNewTab(
+                                    c.comment,
+                                    c.assignmentName,
+                                    c.submittedAt,
+                                    c.checklistChecked
+                                  )
+                                }
+                              >
+                                Open in new tab
+                              </button>
                             </td>
                           </tr>
-                          );
-                        })}
+                        ))}
                       </tbody>
                     </table>
                   </div>
