@@ -1,6 +1,6 @@
 const _rawApiUrl =
   process.env.REACT_APP_API_URL ||
-  (process.env.NODE_ENV === 'production' ? 'https://kable-career-admin.onrender.com' : 'http://localhost:5000');
+  (process.env.NODE_ENV === 'production' ? 'https://kable-career-backend.onrender.com' : 'http://localhost:5000');
 export const API_URL = String(_rawApiUrl).trim().replace(/\/+$/, '');
 const AUTH_KEY = 'kable_admin_user';
 
