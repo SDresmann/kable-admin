@@ -33,9 +33,25 @@ export default function CreateUser() {
     }
     setLoading(true);
     try {
-      await createUser(email.trim().toLowerCase(), password, role, role === 'student' ? (cohortId.trim() || null) : null);
+      const createdEmail = email.trim().toLowerCase();
+      const result = await createUser(createdEmail, password, role, role === 'student' ? (cohortId.trim() || null) : null);
       const portal = role === 'admin' ? 'admin portal' : 'student portal (Kable Career)';
-      setSuccess(`${role === 'admin' ? 'Admin' : 'Student'} user ${email.trim().toLowerCase()} created. They can log in at the ${portal} and change their password.`);
+      if (role === 'student' && result?.emailQueued) {
+        setSuccess(
+          `Student user ${createdEmail} created. Welcome email is sending in the background (check spam/quarantine if it is slow).`
+        );
+      } else if (role === 'student' && result && result.emailSent === false) {
+        const detail = result.emailError ? ` Email error: ${result.emailError}` : '';
+        setError(`Student user ${createdEmail} was created, but welcome email failed.${detail}`);
+      } else {
+        const via =
+          role === 'student' && result?.emailProvider
+            ? ` Welcome email sent via ${result.emailProvider}.`
+            : '';
+        setSuccess(
+          `${role === 'admin' ? 'Admin' : 'Student'} user ${createdEmail} created. They can log in at the ${portal} and change their password.${via}`
+        );
+      }
       setEmail('');
       setPassword('');
       setCohortId('');

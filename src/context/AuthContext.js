@@ -3,14 +3,28 @@ import { getStoredAuth, setStoredAuth, clearStoredAuth } from '../api';
 
 const AuthContext = createContext(null);
 
+function loadUserFromStorage() {
+  const auth = getStoredAuth();
+  if (auth?.userId && auth?.token && auth?.email) {
+    return { userId: auth.userId, token: auth.token, email: auth.email };
+  }
+  return null;
+}
+
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
+  // Read localStorage on first render so new tabs don't flash-redirect before session restores.
+  const [user, setUser] = useState(loadUserFromStorage);
 
   useEffect(() => {
-    const auth = getStoredAuth();
-    if (auth?.userId && auth?.token && auth?.email) {
-      setUser({ userId: auth.userId, token: auth.token, email: auth.email });
+    setUser(loadUserFromStorage());
+  }, []);
+
+  useEffect(() => {
+    function onSessionLost() {
+      setUser(null);
     }
+    window.addEventListener('kable-admin-session-lost', onSessionLost);
+    return () => window.removeEventListener('kable-admin-session-lost', onSessionLost);
   }, []);
 
   function login(userData) {
