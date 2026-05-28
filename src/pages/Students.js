@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { API_URL, getAuthHeaders } from '../api';
@@ -34,16 +34,9 @@ function buildCommentPreviewHtml(comment, assignmentName, submittedAt, checklist
   return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${escapeHtml(title) || 'Comment'}</title><style>body{font-family:system-ui,sans-serif;max-width:720px;margin:2rem auto;padding:0 1rem;line-height:1.5;white-space:pre-wrap;word-wrap:break-word;} h3{font-size:1rem;margin-top:1.5rem;}</style></head><body><h2>${escapeHtml(assignmentName || 'Comment')}</h2>${submittedAt ? `<p><small>${escapeHtml(new Date(submittedAt).toLocaleString())}</small></p>` : ''}${checklistSection}<h3>Comment / Reflection</h3><div>${body || '—'}</div></body></html>`;
 }
 
-function openCommentPreviewInNewTab(comment, assignmentName, submittedAt, checklistChecked) {
+function getCommentPreviewBlobUrl(comment, assignmentName, submittedAt, checklistChecked) {
   const html = buildCommentPreviewHtml(comment, assignmentName, submittedAt, checklistChecked);
-  const previewWindow = window.open('', '_blank', 'noopener,noreferrer');
-  if (!previewWindow) {
-    window.alert('Pop-up blocked. Allow pop-ups for this site to open the comment preview.');
-    return;
-  }
-  previewWindow.document.open();
-  previewWindow.document.write(html);
-  previewWindow.document.close();
+  return URL.createObjectURL(new Blob([html], { type: 'text/html;charset=utf-8' }));
 }
 
 function percentToLetterGrade(percent) {
@@ -94,6 +87,7 @@ export default function StudentsPage() {
   const [cohortSaving, setCohortSaving] = useState(false);
   const [studentSearch, setStudentSearch] = useState('');
   const [studentSort, setStudentSort] = useState('default');
+  const commentPreviewBlobUrlsRef = useRef([]);
   const { logout } = useAuth();
   const navigate = useNavigate();
 
@@ -137,6 +131,22 @@ export default function StudentsPage() {
     return list;
   }, [students, cohorts, studentSearch, studentSort]);
 
+  const commentPreviewUrls = useMemo(() => {
+    const urls = new Map();
+    studentAssignmentComments.forEach((c) => {
+      const key = c._id || `${c.assignmentName}-${c.submittedAt}-${c.sectionId}`;
+      urls.set(
+        key,
+        getCommentPreviewBlobUrl(c.comment, c.assignmentName, c.submittedAt, c.checklistChecked)
+      );
+    });
+    return urls;
+  }, [studentAssignmentComments]);
+
+  useEffect(() => {
+    commentPreviewUrls.forEach((url) => commentPreviewBlobUrlsRef.current.push(url));
+  }, [commentPreviewUrls]);
+
   useEffect(() => {
     fetchStudents();
   }, []);
@@ -158,6 +168,8 @@ export default function StudentsPage() {
   };
 
   const openModal = (student) => {
+    commentPreviewBlobUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
+    commentPreviewBlobUrlsRef.current = [];
     const studentCopy = { ...student };
     setSelectedStudent(studentCopy);
     setEditedName(studentCopy.name || studentCopy.email?.split('@')[0] || '');
@@ -243,6 +255,8 @@ export default function StudentsPage() {
   };
 
   const closeModal = () => {
+    commentPreviewBlobUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
+    commentPreviewBlobUrlsRef.current = [];
     setIsModalOpen(false);
     setSelectedStudent(null);
     setEditingName(false);
@@ -700,7 +714,10 @@ export default function StudentsPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {studentAssignmentComments.map((c) => (
+                        {studentAssignmentComments.map((c) => {
+                          const previewKey = c._id || `${c.assignmentName}-${c.submittedAt}-${c.sectionId}`;
+                          const previewUrl = commentPreviewUrls.get(previewKey);
+                          return (
                           <tr key={c._id}>
                             <td>{c.assignmentName || '—'}</td>
                             <td>Section {c.sectionId}</td>
@@ -722,23 +739,20 @@ export default function StudentsPage() {
                             </td>
                             <td className="comment-cell">{c.comment ? (c.comment.length > 80 ? c.comment.slice(0, 80) + '…' : c.comment) : '—'}</td>
                             <td>
-                              <button
-                                type="button"
-                                className="comment-open-link button-as-link"
-                                onClick={() =>
-                                  openCommentPreviewInNewTab(
-                                    c.comment,
-                                    c.assignmentName,
-                                    c.submittedAt,
-                                    c.checklistChecked
-                                  )
-                                }
-                              >
-                                Open in new tab
-                              </button>
+                              {previewUrl ? (
+                                <a
+                                  href={previewUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="comment-open-link"
+                                >
+                                  Open in new tab
+                                </a>
+                              ) : null}
                             </td>
                           </tr>
-                        ))}
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
