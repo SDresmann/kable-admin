@@ -22,7 +22,7 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
-function getCommentPreviewBlobUrl(comment, assignmentName, submittedAt, checklistChecked) {
+function buildCommentPreviewHtml(comment, assignmentName, submittedAt, checklistChecked) {
   const title = [assignmentName, submittedAt ? new Date(submittedAt).toLocaleDateString() : ''].filter(Boolean).join(' – ');
   const body = escapeHtml(comment || '').replace(/\n/g, '<br>');
   let checklistSection = '';
@@ -31,8 +31,19 @@ function getCommentPreviewBlobUrl(comment, assignmentName, submittedAt, checklis
     const list = checklistChecked.map((v, i) => `Item ${i + 1}: ${v ? '✓' : '—'}`).join('<br>');
     checklistSection = `<h3>Checklist</h3><p><strong>${checked} of ${checklistChecked.length} completed</strong></p><p>${list}</p>`;
   }
-  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${escapeHtml(title) || 'Comment'}</title><style>body{font-family:system-ui,sans-serif;max-width:720px;margin:2rem auto;padding:0 1rem;line-height:1.5;white-space:pre-wrap;word-wrap:break-word;} h3{font-size:1rem;margin-top:1.5rem;}</style></head><body><h2>${escapeHtml(assignmentName || 'Comment')}</h2>${submittedAt ? `<p><small>${escapeHtml(new Date(submittedAt).toLocaleString())}</small></p>` : ''}${checklistSection}<h3>Comment / Reflection</h3><div>${body || '—'}</div></body></html>`;
-  return URL.createObjectURL(new Blob([html], { type: 'text/html;charset=utf-8' }));
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${escapeHtml(title) || 'Comment'}</title><style>body{font-family:system-ui,sans-serif;max-width:720px;margin:2rem auto;padding:0 1rem;line-height:1.5;white-space:pre-wrap;word-wrap:break-word;} h3{font-size:1rem;margin-top:1.5rem;}</style></head><body><h2>${escapeHtml(assignmentName || 'Comment')}</h2>${submittedAt ? `<p><small>${escapeHtml(new Date(submittedAt).toLocaleString())}</small></p>` : ''}${checklistSection}<h3>Comment / Reflection</h3><div>${body || '—'}</div></body></html>`;
+}
+
+function openCommentPreviewInNewTab(comment, assignmentName, submittedAt, checklistChecked) {
+  const html = buildCommentPreviewHtml(comment, assignmentName, submittedAt, checklistChecked);
+  const previewWindow = window.open('', '_blank', 'noopener,noreferrer');
+  if (!previewWindow) {
+    window.alert('Pop-up blocked. Allow pop-ups for this site to open the comment preview.');
+    return;
+  }
+  previewWindow.document.open();
+  previewWindow.document.write(html);
+  previewWindow.document.close();
 }
 
 function percentToLetterGrade(percent) {
@@ -125,24 +136,6 @@ export default function StudentsPage() {
     }
     return list;
   }, [students, cohorts, studentSearch, studentSort]);
-
-  const commentPreviewUrls = useMemo(() => {
-    const urls = new Map();
-    studentAssignmentComments.forEach((c) => {
-      const key = c._id || `${c.assignmentName}-${c.submittedAt}-${c.sectionId}`;
-      urls.set(
-        key,
-        getCommentPreviewBlobUrl(c.comment, c.assignmentName, c.submittedAt, c.checklistChecked)
-      );
-    });
-    return urls;
-  }, [studentAssignmentComments]);
-
-  useEffect(() => {
-    return () => {
-      commentPreviewUrls.forEach((url) => URL.revokeObjectURL(url));
-    };
-  }, [commentPreviewUrls]);
 
   useEffect(() => {
     fetchStudents();
@@ -707,10 +700,7 @@ export default function StudentsPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {studentAssignmentComments.map((c) => {
-                          const previewKey = c._id || `${c.assignmentName}-${c.submittedAt}-${c.sectionId}`;
-                          const previewUrl = commentPreviewUrls.get(previewKey);
-                          return (
+                        {studentAssignmentComments.map((c) => (
                           <tr key={c._id}>
                             <td>{c.assignmentName || '—'}</td>
                             <td>Section {c.sectionId}</td>
@@ -732,20 +722,23 @@ export default function StudentsPage() {
                             </td>
                             <td className="comment-cell">{c.comment ? (c.comment.length > 80 ? c.comment.slice(0, 80) + '…' : c.comment) : '—'}</td>
                             <td>
-                              {previewUrl ? (
-                                <a
-                                  href={previewUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="comment-open-link"
-                                >
-                                  Open in new tab
-                                </a>
-                              ) : null}
+                              <button
+                                type="button"
+                                className="comment-open-link button-as-link"
+                                onClick={() =>
+                                  openCommentPreviewInNewTab(
+                                    c.comment,
+                                    c.assignmentName,
+                                    c.submittedAt,
+                                    c.checklistChecked
+                                  )
+                                }
+                              >
+                                Open in new tab
+                              </button>
                             </td>
                           </tr>
-                          );
-                        })}
+                        ))}
                       </tbody>
                     </table>
                   </div>
